@@ -1,4 +1,19 @@
-# Claude Code Rules
+# Todo Hackathon Phase II - Monorepo
+
+Full-stack web todo app with auth and Neon DB.
+
+Specs in /specs – always reference with @specs/file.md
+
+Structure:
+- frontend: Next.js App Router + Tailwind
+- backend: FastAPI + SQLModel
+- specs: organized by type
+
+Workflow:
+1. Read spec
+2. Implement backend first
+3. Implement frontend
+4. Use agents/skills for reusable logic# Claude Code Rules
 
 This file is generated during init for the selected agent.
 
@@ -208,3 +223,10 @@ Wait for consent; never auto-create ADRs. Group related decisions (stacks, authe
 
 ## Code Standards
 See `.specify/memory/constitution.md` for code quality, testing, performance, security, and architecture principles.
+
+## Active Technologies
+- Python 3.11+ (backend), TypeScript 5.x (frontend) + FastAPI 0.104+, SQLModel 0.0.14+, Pydantic 2.x, Next.js 14+ (App Router), Tailwind CSS 3.x, Better Auth (JWT), psycopg2/asyncpg (PostgreSQL driver) (001-task-crud)
+- Neon PostgreSQL (cloud-hosted) (001-task-crud)
+
+## Recent Changes
+- 001-task-crud: Added Python 3.11+ (backend), TypeScript 5.x (frontend) + FastAPI 0.104+, SQLModel 0.0.14+, Pydantic 2.x, Next.js 14+ (App Router), Tailwind CSS 3.x, Better Auth (JWT), psycopg2/asyncpg (PostgreSQL driver)

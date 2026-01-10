@@ -1,55 +1,178 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report:
+- Version: NEW → 1.0.0 (Initial constitution for Todo Hackathon Phase II project)
+- Added principles: Spec-Driven Development, Security & User Isolation, Clean Architecture, Reusable Intelligence
+- Added sections: Technology Stack, Constraints, Governance
+- Templates status:
+  ✅ plan-template.md - Constitution Check section aligns with new principles
+  ✅ spec-template.md - Requirements structure supports security and user story approach
+  ✅ tasks-template.md - Task organization supports modular implementation
+- Follow-up: None - all placeholders filled
+-->
+
+# Todo Hackathon Phase II Constitution
+
+## Project Overview
+
+Full-stack multi-user web todo application with authentication and persistent storage, built entirely through Spec-Driven Development principles using Claude Code agents.
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Spec-Driven Development (NON-NEGOTIABLE)
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+All code MUST be generated from specifications via Claude Code agents. Manual code changes are prohibited.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+**Requirements:**
+- Every feature begins with a specification document
+- Implementation follows the SDD workflow: spec → plan → tasks → implementation
+- Agents and skills handle all code generation and modifications
+- Documentation precedes implementation in all cases
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+**Rationale:** Ensures consistency, traceability, and leverages AI-assisted development to maximize development velocity while maintaining quality standards.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### II. Security & User Isolation (NON-NEGOTIABLE)
 
-### [PRINCIPLE_6_NAME]
+User data MUST be completely isolated with mandatory authentication for all operations.
 
+**Requirements:**
+- JWT-based authentication via Better Auth for all API requests
+- Every database query MUST filter by authenticated user_id
+- No user can access, modify, or view another user's tasks
+- Authentication token validation required at API boundary
+- Shared secret (BETTER_AUTH_SECRET) used for token verification
 
-[PRINCIPLE__DESCRIPTION]
+**Rationale:** Multi-user application requires strict data isolation to protect user privacy and prevent unauthorized access.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### III. Clean Architecture
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+Monorepo structure with clear separation between frontend presentation and backend business logic.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+**Requirements:**
+- Frontend: Next.js App Router with TypeScript and Tailwind CSS
+- Backend: FastAPI with SQLModel for database operations
+- RESTful API contract under /api/tasks endpoints
+- Frontend communicates only through defined API contracts
+- Database operations isolated to backend services
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+**Rationale:** Separation of concerns enables independent development, testing, and scaling of frontend and backend systems.
+
+### IV. Reusable Intelligence (BONUS OBJECTIVE)
+
+Implement agents and skills for common task operations to demonstrate advanced automation capabilities.
+
+**Requirements:**
+- Create reusable Claude Code agents for complex workflows
+- Develop skills for repetitive task operations
+- Document agent and skill implementations
+- Ensure agents follow project constitution and standards
+
+**Rationale:** Demonstrates advanced AI-assisted development patterns and provides reusable automation for future development work.
+
+## Technology Stack
+
+### Frontend
+- **Framework**: Next.js (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **State Management**: React hooks and server components
+- **API Client**: Fetch API with JWT token headers
+
+### Backend
+- **Framework**: FastAPI
+- **Language**: Python
+- **ORM**: SQLModel
+- **Database**: Neon PostgreSQL
+- **Authentication**: Better Auth with JWT tokens
+
+### Database Schema
+- **tasks table**: Core entity with user_id foreign key
+- **users table**: Authentication and profile data
+- **All tables**: Include user_id for multi-tenancy enforcement
+
+## Constraints
+
+### Development Process
+- **No Manual Coding**: All implementation through Claude Code specs and agents
+- **Spec-First**: No code without specification
+- **Auth-First**: All API endpoints require valid JWT authentication
+- **User-Scoped**: All data operations filtered by authenticated user_id
+
+### Security
+- **Shared Secret**: BETTER_AUTH_SECRET environment variable for token signing
+- **Token Validation**: JWT verification on every API request
+- **Data Isolation**: Automatic user_id filtering in all database queries
+- **No Direct Access**: Frontend cannot directly access database
+
+### Quality
+- **Type Safety**: TypeScript on frontend, type hints on backend
+- **Responsive Design**: Mobile-first Tailwind implementation
+- **Error Handling**: Graceful degradation for auth and API failures
+- **Data Persistence**: All state persisted to Neon database
+
+## Success Criteria
+
+The project is considered complete when ALL of the following are met:
+
+1. **Authentication**:
+   - Users can sign up with email/password
+   - Users can log in and receive JWT token
+   - Invalid credentials are rejected gracefully
+
+2. **Task Operations**:
+   - Logged-in users can create tasks
+   - Users can view only their own tasks
+   - Users can update their own tasks
+   - Users can delete their own tasks
+   - All operations require valid JWT token
+
+3. **Data Persistence**:
+   - All tasks stored in Neon PostgreSQL
+   - Data survives application restarts
+   - User data is completely isolated
+
+4. **User Experience**:
+   - Responsive UI works on mobile and desktop
+   - Clear feedback for all operations
+   - Loading and error states handled
+
+5. **Advanced Implementation** (BONUS):
+   - Agents implemented for complex workflows
+   - Skills created for repetitive operations
+   - Reusable intelligence documented
+
+6. **Spec-Driven Compliance**:
+   - All features implemented from specifications
+   - Complete audit trail from spec to code
+   - No manual code modifications
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+### Amendment Process
+- Constitution updates require documentation in Prompt History Records (PHRs)
+- Version number MUST be incremented following semantic versioning
+- Changes propagated to dependent templates and documentation
+- All amendments recorded with rationale and impact analysis
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+### Compliance Verification
+- All specifications MUST reference constitution principles
+- Implementation plans MUST include Constitution Check section
+- Tasks MUST align with architectural constraints
+- Code reviews verify adherence to security and isolation requirements
+
+### Version Management
+- MAJOR: Backward incompatible principle changes (e.g., removing authentication requirement)
+- MINOR: New principles added or expanded guidance (e.g., adding observability requirements)
+- PATCH: Clarifications, wording improvements, non-semantic refinements
+
+### PHR Creation
+- Record every user interaction in Prompt History Records
+- Route to appropriate directory: constitution/, feature-name/, or general/
+- Include full prompt text and response summary
+- Validate no unresolved placeholders
+
+### Architectural Decision Records
+- Suggest ADR creation for significant decisions during planning
+- Never auto-create ADRs without user consent
+- Follow three-part test: Impact + Alternatives + Scope
+
+**Version**: 1.0.0 | **Ratified**: 2026-01-08 | **Last Amended**: 2026-01-08

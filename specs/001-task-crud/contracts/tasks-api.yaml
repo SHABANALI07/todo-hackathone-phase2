@@ -1,0 +1,484 @@
+openapi: 3.0.3
+info:
+  title: Task CRUD API
+  description: RESTful API for managing tasks with user authentication and isolation
+  version: 1.0.0
+  contact:
+    name: Todo Hackathon Phase II
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://api.example.com
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /api/tasks:
+    get:
+      summary: List user's tasks
+      description: Retrieve all tasks belonging to the authenticated user with optional status filtering
+      operationId: listTasks
+      tags:
+        - Tasks
+      parameters:
+        - name: status
+          in: query
+          description: Filter tasks by completion status
+          required: false
+          schema:
+            type: string
+            enum: [all, complete, incomplete]
+            default: all
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved task list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskListResponse'
+              examples:
+                allTasks:
+                  summary: All tasks
+                  value:
+                    tasks:
+                      - id: 1
+                        title: "Complete project proposal"
+                        description: "Draft and submit the Q1 project proposal document"
+                        is_complete: false
+                        created_at: "2026-01-06T10:30:00Z"
+                        updated_at: "2026-01-06T10:30:00Z"
+                        user_id: 42
+                      - id: 2
+                        title: "Review pull requests"
+                        description: null
+                        is_complete: true
+                        created_at: "2026-01-07T14:15:00Z"
+                        updated_at: "2026-01-07T16:20:00Z"
+                        user_id: 42
+                    total_count: 2
+                    filtered_count: 2
+                completeTasks:
+                  summary: Complete tasks only
+                  value:
+                    tasks:
+                      - id: 2
+                        title: "Review pull requests"
+                        description: null
+                        is_complete: true
+                        created_at: "2026-01-07T14:15:00Z"
+                        updated_at: "2026-01-07T16:20:00Z"
+                        user_id: 42
+                    total_count: 2
+                    filtered_count: 1
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create a new task
+      description: Create a new task for the authenticated user
+      operationId: createTask
+      tags:
+        - Tasks
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreate'
+            examples:
+              withDescription:
+                summary: Task with description
+                value:
+                  title: "Complete project proposal"
+                  description: "Draft and submit the Q1 project proposal document"
+              withoutDescription:
+                summary: Task without description
+                value:
+                  title: "Review pull requests"
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+              example:
+                id: 1
+                title: "Complete project proposal"
+                description: "Draft and submit the Q1 project proposal document"
+                is_complete: false
+                created_at: "2026-01-08T10:30:00Z"
+                updated_at: "2026-01-08T10:30:00Z"
+                user_id: 42
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/tasks/{id}:
+    get:
+      summary: Get a specific task
+      description: Retrieve a single task by ID (must belong to authenticated user)
+      operationId: getTask
+      tags:
+        - Tasks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Task ID
+          schema:
+            type: integer
+            minimum: 1
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Task retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+              example:
+                id: 1
+                title: "Complete project proposal"
+                description: "Draft and submit the Q1 project proposal document"
+                is_complete: false
+                created_at: "2026-01-08T10:30:00Z"
+                updated_at: "2026-01-08T10:30:00Z"
+                user_id: 42
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update a task
+      description: Update title and/or description of an existing task (must belong to authenticated user)
+      operationId: updateTask
+      tags:
+        - Tasks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Task ID
+          schema:
+            type: integer
+            minimum: 1
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdate'
+            examples:
+              updateTitle:
+                summary: Update title only
+                value:
+                  title: "Complete project proposal by Friday"
+              updateBoth:
+                summary: Update title and description
+                value:
+                  title: "Complete project proposal by Friday"
+                  description: "Draft, review, and submit the Q1 project proposal document by EOD Friday"
+              updateDescription:
+                summary: Update description only
+                value:
+                  description: "Draft, review with team, and submit"
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+              example:
+                id: 1
+                title: "Complete project proposal by Friday"
+                description: "Draft, review, and submit the Q1 project proposal document by EOD Friday"
+                is_complete: false
+                created_at: "2026-01-08T10:30:00Z"
+                updated_at: "2026-01-08T15:45:00Z"
+                user_id: 42
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete a task
+      description: Permanently delete a task (must belong to authenticated user)
+      operationId: deleteTask
+      tags:
+        - Tasks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Task ID
+          schema:
+            type: integer
+            minimum: 1
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Task deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/tasks/{id}/toggle:
+    patch:
+      summary: Toggle task completion status
+      description: Toggle a task between complete and incomplete states (must belong to authenticated user)
+      operationId: toggleTaskCompletion
+      tags:
+        - Tasks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Task ID
+          schema:
+            type: integer
+            minimum: 1
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Task completion status toggled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+              example:
+                id: 1
+                title: "Complete project proposal"
+                description: "Draft and submit the Q1 project proposal document"
+                is_complete: true
+                created_at: "2026-01-08T10:30:00Z"
+                updated_at: "2026-01-08T16:20:00Z"
+                user_id: 42
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from authentication endpoint
+
+  schemas:
+    TaskResponse:
+      type: object
+      required:
+        - id
+        - title
+        - is_complete
+        - created_at
+        - updated_at
+        - user_id
+      properties:
+        id:
+          type: integer
+          description: Unique task identifier
+          example: 1
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Task title
+          example: "Complete project proposal"
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+          description: Optional task description
+          example: "Draft and submit the Q1 project proposal document"
+        is_complete:
+          type: boolean
+          description: Completion status
+          example: false
+        created_at:
+          type: string
+          format: date-time
+          description: Task creation timestamp (ISO 8601)
+          example: "2026-01-08T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp (ISO 8601)
+          example: "2026-01-08T10:30:00Z"
+        user_id:
+          type: integer
+          description: Owner user ID
+          example: 42
+
+    TaskCreate:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Task title (required, 1-200 characters)
+          example: "Complete project proposal"
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+          description: Optional task description (max 1000 characters)
+          example: "Draft and submit the Q1 project proposal document"
+
+    TaskUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Updated task title (1-200 characters)
+          example: "Complete project proposal by Friday"
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+          description: Updated task description (max 1000 characters)
+          example: "Draft, review, and submit the Q1 project proposal document by EOD Friday"
+
+    TaskListResponse:
+      type: object
+      required:
+        - tasks
+        - total_count
+        - filtered_count
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskResponse'
+          description: Array of tasks
+        total_count:
+          type: integer
+          description: Total number of user's tasks (before filtering)
+          example: 10
+        filtered_count:
+          type: integer
+          description: Number of tasks after applying status filter
+          example: 5
+
+    Error:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+          description: Human-readable error message
+          example: "Invalid or missing authentication token"
+
+  responses:
+    ValidationError:
+      description: Validation error (invalid input data)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            titleTooLong:
+              summary: Title exceeds maximum length
+              value:
+                detail: "Title cannot exceed 200 characters"
+            titleRequired:
+              summary: Title is missing
+              value:
+                detail: "Title is required"
+            titleWhitespace:
+              summary: Title is only whitespace
+              value:
+                detail: "Title cannot be only whitespace"
+            descriptionTooLong:
+              summary: Description exceeds maximum length
+              value:
+                detail: "Description cannot exceed 1000 characters"
+
+    UnauthorizedError:
+      description: Authentication required (missing or invalid JWT token)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            detail: "Invalid or missing authentication token"
+
+    ForbiddenError:
+      description: Access denied (task belongs to different user)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            detail: "Access denied to this task"
+
+    NotFoundError:
+      description: Task not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            detail: "Task not found"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            detail: "An internal error occurred. Please try again later."
+
+tags:
+  - name: Tasks
+    description: Task management operations (CRUD + toggle completion)
