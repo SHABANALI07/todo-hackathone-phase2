@@ -1,0 +1,56 @@
+# =====================
+# ENV / SECRETS
+# =====================
+.env
+.env.*
+!.env.example
+
+backend/.env
+frontend/.env*
+!frontend/.env.local.example
+
+# =====================
+# PYTHON
+# =====================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.venv/
+backend/venv/
+
+# =====================
+# NODE / FRONTEND
+# =====================
+node_modules/
+frontend/node_modules/
+
+.next/
+frontend/.next/
+
+# =====================
+# DATABASE FILES
+# =====================
+*.db
+*.sqlite
+*.sqlite3
+
+# =====================
+# LOGS
+# =====================
+*.log
+
+# =====================
+# OS / EDITOR
+# =====================
+.DS_Store
+Thumbs.db
+.vscode/
+
+# =====================
+# SPECIFIC TO YOUR PROJECT
+# =====================
+.specify/memory/
+.spec-kit/
+.claude/settings.local.json
